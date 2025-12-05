@@ -4,8 +4,8 @@ import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 
 # --- CONFIGURATION ---
-SEARCH_QUERY = '"smart fan" (atomberg OR orient OR havells)'
-SCROLL_LIMIT = 5  # Increase this to get more data
+SEARCH_QUERY = '"smart fan"'
+SCROLL_LIMIT = 20  # Increase this to get more data
 
 def init_driver():
     # undetected_chromedriver automatically handles the driver binary
