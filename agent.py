@@ -80,6 +80,64 @@ class AtombergMarketingAgent:
         self.driver = None
         self.brain = CognitionEngine()
 
+    def _get_chrome_version(self):
+        """Detect installed Chrome version dynamically"""
+        try:
+            import subprocess
+            import platform
+            
+            system = platform.system()
+            
+            if system == "Darwin":  # macOS
+                cmd = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '--version']
+            elif system == "Windows":
+                # Try multiple possible paths
+                possible_paths = [
+                    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+                    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+                ]
+                cmd = None
+                for path in possible_paths:
+                    if os.path.exists(path):
+                        cmd = [path, '--version']
+                        break
+                if not cmd:
+                    raise Exception("Chrome not found in standard Windows paths")
+            elif system == "Linux":
+                # Try common Linux paths
+                possible_cmds = [
+                    ['google-chrome', '--version'],
+                    ['google-chrome-stable', '--version'],
+                    ['chromium-browser', '--version'],
+                ]
+                cmd = None
+                for test_cmd in possible_cmds:
+                    try:
+                        subprocess.run(test_cmd, capture_output=True, text=True, timeout=2)
+                        cmd = test_cmd
+                        break
+                    except:
+                        continue
+                if not cmd:
+                    raise Exception("Chrome not found in standard Linux paths")
+            else:
+                raise Exception(f"Unsupported operating system: {system}")
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+            version_match = re.search(r'(\d+)\.', result.stdout)
+            
+            if version_match:
+                version = int(version_match.group(1))
+                print(f"[{self.name}] 🔍 Detected Chrome version: {version}")
+                return version
+            else:
+                raise Exception("Could not parse Chrome version")
+                
+        except Exception as e:
+            print(f"[{self.name}] ⚠️ Auto-detection failed: {e}")
+            print(f"[{self.name}] Using fallback version: 142")
+            return 142
+
     def _init_driver(self):
         # Force kill old instance if exists
         if self.driver:
@@ -93,9 +151,11 @@ class AtombergMarketingAgent:
             # Critical stability fixes for Mac
             options.add_argument('--disable-popup-blocking') 
             
-            # Simple init - let UC handle versioning
-            self.driver = uc.Chrome(options=options, version_main=142)
-            print(f"[{self.name}] ✅ Browser started.")
+            # Dynamically detect Chrome version
+            version_main = self._get_chrome_version()
+            
+            self.driver = uc.Chrome(options=options, version_main=version_main)
+            print(f"[{self.name}] ✅ Browser started (Chrome v{version_main}).")
         except Exception as e:
             print(f"[{self.name}] ❌ CRITICAL DRIVER ERROR: {e}")
             raise e
