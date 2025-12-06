@@ -1,0 +1,9 @@
+pandas
+numpy
+python-dotenv
+selenium
+undetected-chromedriver
+textblob
+langchain-google-genai
+langchain-core
+setuptools
