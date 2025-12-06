@@ -1,4 +1,4 @@
-# Atomberg Marketing Intelligence Agent
+# Atomberg  Agent
 
 An autonomous AI-powered agent that monitors and analyzes brand presence across social media platforms (YouTube and X/Twitter) to calculate Share of Voice (SoV) and extract strategic customer insights.
 
